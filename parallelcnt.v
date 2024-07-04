@@ -1,5 +1,7 @@
 //By Alexander Peacock
 //email: alexpeacock56ten@gmail.com
+`ifndef parallelcnt
+`define parallelcnt
 
 module parallelcnt (
     input wire iClk,
@@ -12,3 +14,5 @@ module parallelcnt (
     assign oC = iA + iB;
 
 endmodule
+
+`endif

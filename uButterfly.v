@@ -1,9 +1,13 @@
 //By Alexander Peacock, undergrad at UCF ECE
 //email: alexpeacock56ten@gmail.com
 
+`ifndef uButterfly
+`define uButterfly
+
 `include "uMUL_bi.v"
 `include "uSADD.v"
 `include "uSSUB.v"
+
 
 module uButterfly #(
     parameter BITWIDTH = 8,
@@ -15,20 +19,22 @@ module uButterfly #(
     input wire iClr,
     input wire iReal0,
     input wire iImg0,
-    input wire [BITWIDTH-1:0] wReal,
-    input wire [BITWIDTH-1:0] wImg,
-    output reg oReal0,
-    output reg oImg0,
-    output reg oReal1,
-    output reg oImg1
+    input wire iReal1,
+    input wire iImg1,
+    input wire [BITWIDTH-1:0] iwReal,
+    input wire [BITWIDTH-1:0] iwImg,
+    output wire oReal0,
+    output wire oImg0,
+    output wire oReal1,
+    output wire oImg1
 );
 
-    reg eq_1;
-    reg eq_2;
-    reg q_3;
-    reg eq_4;
-    reg real_eq;
-    reg img_eq;
+    wire eq_1;
+    wire eq_2;
+    wire eq_3;
+    wire eq_4;
+    wire real_eq;
+    wire img_eq;
 
     //these account for the multiplication of input 0 with w
     uMUL_bi #(
@@ -36,8 +42,8 @@ module uButterfly #(
     )u_uMUL_bi_1 (
         .iClk(iClk),
         .iRstN(iRstN),
-        .iA(iReal0),
-        .iB(wReal),
+        .iA(iReal1),
+        .iB(iwReal),
         .loadB(loadB),
         .iClr(iClr),
         .oMult(eq_1)
@@ -48,8 +54,8 @@ module uButterfly #(
     ) u_uMUL_bi_2 (
         .iClk(iClk),
         .iRstN(iRstN),
-        .iA(iReal0),
-        .iB(wImg),
+        .iA(iReal1),
+        .iB(iwImg),
         .loadB(loadB),
         .iClr(iClr),
         .oMult(eq_2)
@@ -60,8 +66,8 @@ module uButterfly #(
     ) u_uMUL_bi_3 (
         .iClk(iClk),
         .iRstN(iRstN),
-        .iA(iImg0),
-        .iB(wReal),
+        .iA(iImg1),
+        .iB(iwReal),
         .loadB(loadB),
         .iClr(iClr),
         .oMult(eq_3)
@@ -72,8 +78,8 @@ module uButterfly #(
     ) u_uMUL_bi_4 (
         .iClk(iClk),
         .iRstN(iRstN),
-        .iA(iImg0),
-        .iB(wImg),
+        .iA(iImg1),
+        .iB(iwImg),
         .loadB(loadB),
         .iClr(iClr),
         .oMult(eq_4)
@@ -144,3 +150,5 @@ module uButterfly #(
     );
     
 endmodule
+
+`endif

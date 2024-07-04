@@ -1,3 +1,4 @@
+`ifndef lsz
 `define lsz
 
 module lsz # (
@@ -48,3 +49,4 @@ module lsz # (
 
 endmodule
 
+`endif

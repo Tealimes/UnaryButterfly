@@ -1,3 +1,4 @@
+`ifndef sobolrng
 `define sobolrng
 `define BITWIDTH8
 
@@ -12,7 +13,7 @@ module sobolrng #(
     input wire iRstN, //asynch reset active low
     input wire iEn, 
     input wire iClr, 
-    output reg [BITWIDTH - 1: 0] sobolseq
+    output wire [BITWIDTH - 1: 0] sobolseq
 );
 
     wire [BITWIDTH - 1: 0] cntNum;
@@ -135,3 +136,4 @@ module sobolrng #(
 
 endmodule
 
+`endif

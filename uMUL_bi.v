@@ -1,5 +1,7 @@
 //By Alexander Peacock, undergrad at UCF ECE
 //email: alexpeacock56ten@gmail.com
+`ifndef uMUL_bi
+`define uMUL_bi
 
 `include "sobolrng.v"
 
@@ -64,3 +66,4 @@ module uMUL_bi #(
 
 endmodule
 
+`endif
