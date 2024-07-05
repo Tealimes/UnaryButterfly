@@ -33,6 +33,8 @@ module uButterfly #(
     wire eq_2;
     wire eq_3;
     wire eq_4;
+    wire scalerReal0;
+    wire scalerImg0;
     wire real_eq;
     wire img_eq;
 
@@ -107,6 +109,27 @@ module uButterfly #(
         .oC(img_eq) 
     );
 
+    //scales first input to match with the other scaled equations
+    uSADD #(
+        .BINPUT(BINPUT)
+    ) u_uSADD_scalerReal (
+        .iClk(iClk),
+        .iRstN(iRstN),
+        .iA(real_eq),
+        .iB(0),
+        .oC(scalerReal0)
+    );
+
+    uSADD #(
+        .BINPUT(BINPUT)
+    ) uSADD_scalerImg (
+        .iClk(iClk),
+        .iRstN(iRstN),
+        .iA(img_eq),
+        .iB(0),
+        .oC(scalerImg0)
+    );
+
     //used to find final outputs
 
     uSADD #(
@@ -114,7 +137,7 @@ module uButterfly #(
     ) u_uSADD_oReal0 (
         .iClk(iClk),
         .iRstN(iRstN),
-        .iA(iReal0),
+        .iA(scalerReal0),
         .iB(real_eq),
         .oC(oReal0) 
     );
@@ -124,9 +147,9 @@ module uButterfly #(
     ) u_uSADD_oImg0 (
         .iClk(iClk),
         .iRstN(iRstN),
-        .iA(iImg0),
+        .iA(scalerImg0),
         .iB(img_eq),
-        .oC(oReal0) 
+        .oC(oImg0) 
     );
 
     uSSUB #(
@@ -134,7 +157,7 @@ module uButterfly #(
     ) u_uSSUB_oReal1 (
         .iClk(iClk),
         .iRstN(iRstN),
-        .iA(iReal0),
+        .iA(scalerReal0),
         .iB(real_eq),
         .oC(oReal1) 
     );
@@ -144,7 +167,7 @@ module uButterfly #(
     ) u_uSSUB_oImg1 (
         .iClk(iClk),
         .iRstN(iRstN),
-        .iA(iImg0),
+        .iA(scalerReal0),
         .iB(img_eq),
         .oC(oImg1) 
     );
