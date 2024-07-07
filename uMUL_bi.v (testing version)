@@ -63,7 +63,7 @@ module uMUL_bi #(
 
     always@(*) begin
         oMult <= andTop | andBot;
-        oB <= andBot; //SEE IF THIS WORKS!!!!!!
+        oB <= (iB_buff > sobolseq);
     end
 
 endmodule
