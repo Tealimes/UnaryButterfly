@@ -1,6 +1,5 @@
 //By Alexander Peacock, undergrad at UCF ECE
 //email: alexpeacock56ten@gmail.com
-//testing version with oBReal and oBImg
 
 `ifndef uButterfly
 `define uButterfly
@@ -42,7 +41,7 @@ module uButterfly #(
     wire img_eq;
     
 
-    //these account for the multiplication of input 0 with w
+    //these account for the multiplication of input 1 with w
     uMUL_bi #(
         .BITWIDTH(BITWIDTH)
     )u_uMUL_bi_1 (
@@ -121,7 +120,7 @@ module uButterfly #(
     ) u_uSADD_scalerReal (
         .iClk(iClk),
         .iRstN(iRstN),
-        .iA(real_eq),
+        .iA(iReal0),
         .iB(0),
         .oC(scalerReal0)
     );
@@ -131,7 +130,7 @@ module uButterfly #(
     ) uSADD_scalerImg (
         .iClk(iClk),
         .iRstN(iRstN),
-        .iA(img_eq),
+        .iA(iImg0),
         .iB(0),
         .oC(scalerImg0)
     );
@@ -173,7 +172,7 @@ module uButterfly #(
     ) u_uSSUB_oImg1 (
         .iClk(iClk),
         .iRstN(iRstN),
-        .iA(scalerReal0),
+        .iA(scalerImg0),
         .iB(img_eq),
         .oC(oImg1) 
     );
