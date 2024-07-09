@@ -15,7 +15,7 @@ module uButterfly #(
 ) (
     input wire iClk,
     input wire iRstN,
-    input wire loadB,
+    input wire loadW,
     input wire iClr,
     input wire iReal0,
     input wire iImg0,
@@ -28,19 +28,31 @@ module uButterfly #(
     output wire oReal0,
     output wire oImg0,
     output wire oReal1,
-    output wire oImg1
+    output wire oImg1,
+    output wire oEq_1,
+    output wire oEq_4,
+    output wire oEq_real,
+    output wire oSReal
 );
 
-    wire eq_1;
-    wire eq_2;
-    wire eq_3;
-    wire eq_4;
+    wire eq_Real1_x_wReal;
+    wire eq_Real1_x_wImg;
+    wire eq_Img1_x_wReal;
+    wire eq_Img1_x_wImg;
     wire scalerReal0;
     wire scalerImg0;
     wire real_eq;
     wire img_eq;
-    
+    reg biZero;
 
+    always@(posedge iClk or negedge iRstN) begin
+        if(~iRstN) begin 
+            biZero <= 0;
+        end else begin
+            biZero <= ~biZero;
+        end
+    end
+    
     //these account for the multiplication of input 1 with w
     uMUL_bi #(
         .BITWIDTH(BITWIDTH)
@@ -49,11 +61,13 @@ module uButterfly #(
         .iRstN(iRstN),
         .iA(iReal1),
         .iB(iwReal),
-        .loadB(loadB),
+        .loadB(loadW),
         .iClr(iClr),
         .oB(oBReal),
-        .oMult(eq_1)
+        .oMult(eq_Real1_x_wReal)
     );
+
+    assign oEq_1 = eq_Real1_x_wReal;
 
     uMUL_bi #(
         .BITWIDTH(BITWIDTH)
@@ -62,10 +76,10 @@ module uButterfly #(
         .iRstN(iRstN),
         .iA(iReal1),
         .iB(iwImg),
-        .loadB(loadB),
+        .loadB(loadW),
         .iClr(iClr),
         .oB(oBImg),
-        .oMult(eq_2)
+        .oMult(eq_Real1_x_wImg)
     );
 
     uMUL_bi #(
@@ -75,9 +89,9 @@ module uButterfly #(
         .iRstN(iRstN),
         .iA(iImg1),
         .iB(iwReal),
-        .loadB(loadB),
+        .loadB(loadW),
         .iClr(iClr),
-        .oMult(eq_3)
+        .oMult(eq_Img1_x_wReal)
     );
 
     uMUL_bi #(
@@ -87,10 +101,12 @@ module uButterfly #(
         .iRstN(iRstN),
         .iA(iImg1),
         .iB(iwImg),
-        .loadB(loadB),
+        .loadB(loadW),
         .iClr(iClr),
-        .oMult(eq_4)
+        .oMult(eq_Img1_x_wImg)
     );
+
+    assign oEq_4 = eq_Img1_x_wImg;
 
     //creates parts to be added and subtracted in butterfly
 
@@ -99,18 +115,20 @@ module uButterfly #(
     ) u_uSSUB_realeq (
         .iClk(iClk),
         .iRstN(iRstN),
-        .iA(eq_1),
-        .iB(eq_4),
+        .iA(eq_Real1_x_wReal),
+        .iB(eq_Img1_x_wImg),
         .oC(real_eq)
     );
+
+    assign oEq_real = real_eq;
 
     uSADD #(
         .BINPUT(BINPUT)
     ) u_uSADD_imgeq (
         .iClk(iClk),
         .iRstN(iRstN),
-        .iA(eq_2),
-        .iB(eq_3),
+        .iA(eq_Real1_x_wImg),
+        .iB(eq_Img1_x_wReal),
         .oC(img_eq) 
     );
 
@@ -121,9 +139,11 @@ module uButterfly #(
         .iClk(iClk),
         .iRstN(iRstN),
         .iA(iReal0),
-        .iB(0),
+        .iB(biZero),
         .oC(scalerReal0)
     );
+
+    assign oSReal = scalerReal0;
 
     uSADD #(
         .BINPUT(BINPUT)
@@ -131,7 +151,7 @@ module uButterfly #(
         .iClk(iClk),
         .iRstN(iRstN),
         .iA(iImg0),
-        .iB(0),
+        .iB(biZero),
         .oC(scalerImg0)
     );
 
