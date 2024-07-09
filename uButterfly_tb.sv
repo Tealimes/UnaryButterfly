@@ -6,7 +6,6 @@
 `include "sobolrng.v"
 `define TESTAMOUNT 10
 
-
 //used to check errors
 class errorcheck;
     real uResult1;
@@ -29,6 +28,10 @@ class errorcheck;
     real outImg0;
     real outReal1;
     real outImg1;
+    real cnt1;
+    real cnt2;
+    real cnt3;
+    real cnts1;
     real asum;
     real mse;
     real rmse;
@@ -48,11 +51,18 @@ class errorcheck;
         outImg0 = 0;
         outReal1 = 0;
         outReal0 = 0;
+        cnt1 = 0;
+        cnt2 = 0;
+        cnt3 = 0;
+        cnts1 = 0;
+
         j = 0;
     endfunction
 
+    //TODO: make eqs more clear
+
     //accumulates to account for bitstreams
-    function count(real a, b, c, d, e, f, oA, oB, oC, oD);
+    function count(real a, b, c, d, e, f, oA, oB, oC, oD, k1, k2, k3, s1);
         cntReal0 = cntReal0 + a;
         cntImg0 = cntImg0 + b;
         cntReal1 = cntReal1 + c;
@@ -63,6 +73,10 @@ class errorcheck;
         outImg0 = outImg0 + oB;
         outReal1 = outReal1 + oC;
         outImg1 = outImg1 + oD;
+        cnt1 = cnt1 + k1;
+        cnt2 = cnt2 + k2;
+        cnt3 = cnt3 + k3;
+        cnts1 = cnts1 + s1;
 
         fdenom++;
     endfunction
@@ -76,8 +90,12 @@ class errorcheck;
         real biwReal;
         real biwImg;
 
-        j++; //counts current run
+        real eq1;
+        real eq2;
+        real eqReal;
+        real scale1;
 
+        j++; //counts current run
 
         biReal0 = (2*(cntReal0/fdenom)) - 1;
         biImg0 = (2*(cntImg0/fdenom)) - 1;
@@ -85,6 +103,12 @@ class errorcheck;
         biImg1 = (2*(cntImg1/fdenom)) - 1;
         biwReal = (2*(cntiwReal/fdenom)) - 1;
         biwImg = (2*(cntiwImg/fdenom)) - 1;
+
+        eq1 = (2*(cnt1/fdenom)) - 1;
+        eq2 = (2*(cnt2/fdenom)) - 1;
+        eqReal = (2*(cnt3/fdenom)) - 1;
+        scale1 = (2*(cnts1/fdenom)) - 1;
+
 
         //bipolar representation
         
@@ -104,9 +128,14 @@ class errorcheck;
         $display("Bipolar Real0 value = %.9f", biReal0);
         $display("Bipolar Image0 value = %.9f", biImg0);
         $display("Bipolar Real1 value = %.9f", biReal1);
-        $display("Bipolar Image1 value = %.9f", biImg0);
+        $display("Bipolar Image1 value = %.9f", biImg1);
         $display("Bipolar wReal value = %.9f", biwReal);
         $display("Bipolar wImg value = %.9f", biwImg);
+
+        $display("Bipolar eq_1 value = %.9f", eq1);
+        $display("Bipolar eq_4 value = %.9f", eq2);
+        $display("Bipolar eq_real value = %.9f", eqReal);
+        $display("Bipolar scalereal value = %.9f", scale1);
 
         //unary result
         uResult1 = (2*(outReal0/fdenom)) - 1;
@@ -143,6 +172,10 @@ class errorcheck;
         outImg0 = 0;
         outReal1 = 0;
         outImg1 = 0;
+        cnt1 = 0;
+        cnt2 = 0;
+        cnt3 = 0;
+        cnts1 = 0;
     endfunction
 
     //mean squared error
@@ -171,10 +204,8 @@ module uButterfly_tb();
     logic iImg0;
     logic iReal1;
     logic iImg1;
-    logic [BITWIDTH-1:0] iwReal;
-    logic [BITWIDTH-1:0] iwImg;
     logic iClr;
-    logic loadB;
+    logic loadW;
     logic oBReal;
     logic oBImg;
     logic oReal0;
@@ -190,10 +221,12 @@ module uButterfly_tb();
     logic [BITWIDTH-1:0] sobolseq_tbB;
     logic [BITWIDTH-1:0] sobolseq_tbC;
     logic [BITWIDTH-1:0] sobolseq_tbD;
-    logic [BITWIDTH-1:0] rand_a;
-    logic [BITWIDTH-1:0] rand_b;
-    logic [BITWIDTH-1:0] rand_c;
-    logic [BITWIDTH-1:0] rand_d;
+    logic [BITWIDTH-1:0] rand_iReal0;
+    logic [BITWIDTH-1:0] rand_iImg0;
+    logic [BITWIDTH-1:0] rand_iReal1;
+    logic [BITWIDTH-1:0] rand_iImg1;
+    logic [BITWIDTH-1:0] iwReal;
+    logic [BITWIDTH-1:0] iwImg;
 
     
     // This code is used to delay the expected output
@@ -212,12 +245,6 @@ module uButterfly_tb();
     logic result4 [PPCYCLE-1:0];
     logic result_expected4;
     assign result_expected4 = oImg1;
-    logic resultwReal [PPCYCLE-1:0];
-    logic result_expectedwReal;
-    assign result_expectedwReal = oBReal;
-    logic resultwImg [PPCYCLE-1:0];
-    logic result_expectedwImg;
-    assign result_expectedwImg = oBImg;
 
     genvar i;
     generate
@@ -228,15 +255,11 @@ module uButterfly_tb();
                     result2[i] <= 0;
                     result3[i] <= 0;
                     result4[i] <= 0;
-                    resultwReal[i] <= 0;
-                    resultwImg[i] <= 0;
                 end else begin
                     result1[i] <= result1[i-1];
                     result2[i] <= result2[i-1];
                     result3[i] <= result3[i-1];
                     result4[i] <= result4[i-1];
-                    resultwReal[i] <= resultwReal[i-1];
-                    resultwImg[i] <= resultwImg[i-1];
                 end
             end
         end
@@ -248,15 +271,11 @@ module uButterfly_tb();
             result2[0] <= 0;
             result3[0] <= 0;
             result4[0] <= 0;
-            resultwReal[0] <= 0;
-            resultwImg[0] <= 0;
         end else begin
             result1[0] <= result_expected1;
             result2[0] <= result_expected2;
             result3[0] <= result_expected3;
             result4[0] <= result_expected4;
-            resultwReal[0] <= result_expectedwReal;
-            resultwImg[0] <= result_expectedwImg;
         end
     end
     // end here
@@ -272,7 +291,6 @@ module uButterfly_tb();
         .iClr(iClr),
         .sobolseq(sobolseq_tbA)
     );
-
     
     sobolrng #(
         .BITWIDTH(BITWIDTH)
@@ -304,14 +322,19 @@ module uButterfly_tb();
         .sobolseq(sobolseq_tbD)
     );
 
-    
+    //JUST FOR TESTING CUZ I HAVE ERROR !!!!!!!!!!!!!!!!!!!!!!!
+    logic eq_1;
+    logic eq_4;
+    logic eq_real;
+    logic oSReal;
+
     uButterfly #(
         .BITWIDTH(BITWIDTH),
         .BINPUT(BINPUT)
     ) u_uButterfly (
         .iClk(iClk),
         .iRstN(iRstN),
-        .loadB(loadB),
+        .loadW(loadW),
         .iClr(iClr),
         .iReal0(iReal0),
         .iImg0(iImg0),
@@ -324,7 +347,11 @@ module uButterfly_tb();
         .oReal0(oReal0),
         .oImg0(oImg0),
         .oReal1(oReal1),
-        .oImg1(oImg1)
+        .oImg1(oImg1),
+        .oEq_1(oEq_1),
+        .oEq_4(oEq_4),
+        .oEq_real(oEq_real),
+        .oSReal(oSReal)
     );
 
     always #5 iClk = ~iClk;
@@ -340,12 +367,12 @@ module uButterfly_tb();
         iRstN = 0;
         iwReal = 0;
         iwImg = 0;
-        rand_a = 0;
-        rand_b = 0;
-        rand_c = 0;
-        rand_d = 0;
+        rand_iReal0 = 0;
+        rand_iImg0 = 0;
+        rand_iReal1 = 0;
+        rand_iImg1 = 0;
         iClr = 0;
-        loadB = 1;
+        loadW = 1;
         error = new;
 
         #10;
@@ -354,20 +381,21 @@ module uButterfly_tb();
         
         //specified cycles of unary bitstreams
         repeat(`TESTAMOUNT) begin
-            rand_a = $urandom_range(255);
-            rand_b = $urandom_range(255);
-            rand_c = $urandom_range(255);
-            rand_d = $urandom_range(255);
+            rand_iReal0 = $urandom_range(255);
+            rand_iImg0 = $urandom_range(255);
+            rand_iReal1 = $urandom_range(255);
+            rand_iImg1 = $urandom_range(255);
             iwReal = $urandom_range(255);
             iwImg = $urandom_range(255);
 
             repeat(256) begin
                 #10; 
-                iReal0 = (rand_a > sobolseq_tbA);
-                iImg0 = (rand_b > sobolseq_tbB);
-                iReal1 = (rand_c > sobolseq_tbC);
-                iImg1 = (rand_d > sobolseq_tbD);
-                error.count(iReal0, iImg0, iReal1, iImg1, resultwReal[PPCYCLE-1], resultwImg[PPCYCLE-1], result1[PPCYCLE-1], result2[PPCYCLE-1], result3[PPCYCLE-1], result4[PPCYCLE-1]);
+                iReal0 = (rand_iReal0 > sobolseq_tbA);
+                iImg0 = (rand_iImg0 > sobolseq_tbB);
+                iReal1 = (rand_iReal1 > sobolseq_tbC);
+                iImg1 = (rand_iImg1 > sobolseq_tbD);
+                error.count(iReal0, iImg0, iReal1, iImg1, oBReal, oBImg, result1[PPCYCLE-1], result2[PPCYCLE-1], 
+                result3[PPCYCLE-1], result4[PPCYCLE-1], oEq_1, oEq_4, oEq_real, oSReal);
             end
 
             error.fSUM();
@@ -382,7 +410,6 @@ module uButterfly_tb();
         iwImg = 0;
         #400;
         
-
         #10;
         #100;
 
