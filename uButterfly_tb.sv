@@ -8,15 +8,14 @@
 
 //used to check errors
 class errorcheck;
-    real uResult1;
-    real uResult2;
-    real uResult3;
-    real uResult4;
-    real eResult1;
-    real eResult2;
-    real eResult3;
-    real eResult4;
-    real fnum;
+    real uResult_Real0;
+    real uResult_Img0;
+    real uResult_Real1;
+    real uResult_Img1;
+    real eResult_Real0;
+    real eResult_Img0;
+    real eResult_Real1;
+    real eResult_Img1;
     real fdenom;
     real cntReal0;
     real cntImg0;
@@ -28,18 +27,22 @@ class errorcheck;
     real outImg0;
     real outReal1;
     real outImg1;
-    real cnt1;
-    real cnt2;
-    real cnt3;
-    real cnts1;
-    real asum;
-    real mse;
-    real rmse;
+    real asum_Real0;
+    real asum_Img0;
+    real asum_Real1;
+    real asum_Img1;
+    real mse_Real0;
+    real mse_Img0;
+    real mse_Real1;
+    real mse_Img1;
+    real rmse_Real0;
+    real rmse_Img0;
+    real rmse_Real1;
+    real rmse_Img1;
     static int j;
 
     function new();
-        asum = 0;
-        fnum = 0;
+        asum_Real0 = 0;
         fdenom = 0;
         cntReal0 = 0;
         cntImg0 = 0;
@@ -51,18 +54,11 @@ class errorcheck;
         outImg0 = 0;
         outReal1 = 0;
         outReal0 = 0;
-        cnt1 = 0;
-        cnt2 = 0;
-        cnt3 = 0;
-        cnts1 = 0;
-
         j = 0;
     endfunction
 
-    //TODO: make eqs more clear
-
     //accumulates to account for bitstreams
-    function count(real a, b, c, d, e, f, oA, oB, oC, oD, k1, k2, k3, s1);
+    function count(real a, b, c, d, e, f, oA, oB, oC, oD);
         cntReal0 = cntReal0 + a;
         cntImg0 = cntImg0 + b;
         cntReal1 = cntReal1 + c;
@@ -73,10 +69,6 @@ class errorcheck;
         outImg0 = outImg0 + oB;
         outReal1 = outReal1 + oC;
         outImg1 = outImg1 + oD;
-        cnt1 = cnt1 + k1;
-        cnt2 = cnt2 + k2;
-        cnt3 = cnt3 + k3;
-        cnts1 = cnts1 + s1;
 
         fdenom++;
     endfunction
@@ -90,11 +82,6 @@ class errorcheck;
         real biwReal;
         real biwImg;
 
-        real eq1;
-        real eq2;
-        real eqReal;
-        real scale1;
-
         j++; //counts current run
 
         biReal0 = (2*(cntReal0/fdenom)) - 1;
@@ -103,12 +90,6 @@ class errorcheck;
         biImg1 = (2*(cntImg1/fdenom)) - 1;
         biwReal = (2*(cntiwReal/fdenom)) - 1;
         biwImg = (2*(cntiwImg/fdenom)) - 1;
-
-        eq1 = (2*(cnt1/fdenom)) - 1;
-        eq2 = (2*(cnt2/fdenom)) - 1;
-        eqReal = (2*(cnt3/fdenom)) - 1;
-        scale1 = (2*(cnts1/fdenom)) - 1;
-
 
         //bipolar representation
         
@@ -123,41 +104,41 @@ class errorcheck;
         $display("Number of 1s in output Real0 = %.0f", outReal0);
         $display("Number of 1s in output Img0 = %.0f", outImg0);
         $display("Number of 1s in output Real1 = %.0f", outReal1);
-        $display("Number of 1s in output Img1 = %.0f", outImg1);
+        $display("Number of 1s in output Img1 = %.0f\n", outImg1);
 
         $display("Bipolar Real0 value = %.9f", biReal0);
         $display("Bipolar Image0 value = %.9f", biImg0);
         $display("Bipolar Real1 value = %.9f", biReal1);
         $display("Bipolar Image1 value = %.9f", biImg1);
         $display("Bipolar wReal value = %.9f", biwReal);
-        $display("Bipolar wImg value = %.9f", biwImg);
-
-        $display("Bipolar eq_1 value = %.9f", eq1);
-        $display("Bipolar eq_4 value = %.9f", eq2);
-        $display("Bipolar eq_real value = %.9f", eqReal);
-        $display("Bipolar scalereal value = %.9f", scale1);
+        $display("Bipolar wImg value = %.9f\n", biwImg);
 
         //unary result
-        uResult1 = (2*(outReal0/fdenom)) - 1;
-        uResult2 = (2*(outImg0/fdenom)) - 1;
-        uResult3 = (2*(outReal1/fdenom)) - 1;
-        uResult4 = (2*(outImg1/fdenom)) - 1;
+        uResult_Real0 = (2*(outReal0/fdenom)) - 1;
+        uResult_Img0 = (2*(outImg0/fdenom)) - 1;
+        uResult_Real1 = (2*(outReal1/fdenom)) - 1;
+        uResult_Img1 = (2*(outImg1/fdenom)) - 1;
 
         //expected results
-        eResult1 = (biReal0 + ((biReal1*biwReal) - (biImg1*biwImg)))/4; 
-        eResult2 = (biImg0 + ((biReal1*biwImg) + (biImg1*biwReal)))/4;
-        eResult3 = (biReal0 - ((biReal1*biwReal) - (biImg1*biwImg)))/4;
-        eResult4 = (biImg0 - ((biReal1*biwImg) + (biImg1*biwReal)))/4;
+        eResult_Real0 = (biReal0 + ((biReal1*biwReal) - (biImg1*biwImg)))/4; 
+        eResult_Img0 = (biImg0 + ((biReal1*biwImg) + (biImg1*biwReal)))/4;
+        eResult_Real1 = (biReal0 - ((biReal1*biwReal) - (biImg1*biwImg)))/4;
+        eResult_Img1 = (biImg0 - ((biReal1*biwImg) + (biImg1*biwReal)))/4;
 
-        $display("Unary result 0 = %.9f + %.9fi", uResult1, uResult2);
-        $display("Unary result 1 = %.9f + %.9fi\n", uResult3, uResult4);
+        $display("Unary result 0 = %.9f + %.9fi", uResult_Real0, uResult_Img0);
+        $display("Unary result 1 = %.9f + %.9fi\n", uResult_Real1, uResult_Img1);
         
-        $display("Expected result 0 = %.9f + %.9fi", eResult1, eResult2);
-        $display("Expected result 1 = %.9f + %.9fi\n", eResult3, eResult4);
+        $display("Expected result 0 = %.9f + %.9fi", eResult_Real0, eResult_Img0);
+        $display("Expected result 1 = %.9f + %.9fi\n", eResult_Real1, eResult_Img1);
 
-        //asum = asum + ((uResult - eResult) * (uResult - eResult));
-        //$display("Cumulated square error = %.9f", asum);
-        //$display("");
+        asum_Real0 = asum_Real0 + ((uResult_Real0 - eResult_Real0) * (uResult_Real0 - eResult_Real0));
+        asum_Img0 = asum_Img0 + ((uResult_Img0 - eResult_Img0) * (uResult_Img0 - eResult_Img0));
+        asum_Real1 = asum_Real1 + ((uResult_Real1 - eResult_Real1) * (uResult_Real1 - eResult_Real1));
+        asum_Img1 = asum_Img1 + ((uResult_Img1 - eResult_Img1) * (uResult_Img1 - eResult_Img1));
+        $display("Real0 cumulated square error = %.9f", asum_Real0);
+        $display("Img0 cumulated square error = %.9f", asum_Img0);
+        $display("Real1 cumulated square error = %.9f", asum_Real1);
+        $display("Img1 cumulated square error = %.9f\n", asum_Img0);
 
         //resets for next bitstreams
 
@@ -172,23 +153,31 @@ class errorcheck;
         outImg0 = 0;
         outReal1 = 0;
         outImg1 = 0;
-        cnt1 = 0;
-        cnt2 = 0;
-        cnt3 = 0;
-        cnts1 = 0;
     endfunction
 
     //mean squared error
     function fMSE();
         $display("Final Results: "); 
-        mse = asum / `TESTAMOUNT;
-        $display("mse: %.9f", mse);
+        mse_Real0 = asum_Real0 / `TESTAMOUNT;
+        mse_Img0 = asum_Img0 / `TESTAMOUNT;
+        mse_Real1 = asum_Real1 / `TESTAMOUNT;
+        mse_Img1 = asum_Img1 / `TESTAMOUNT;
+        $display("Real0 mse: %.9f", mse_Real0);
+        $display("Img0 mse: %.9f", mse_Img0);
+        $display("Real1 mse: %.9f", mse_Real1);
+        $display("Img1 mse: %.9f", mse_Img1);
     endfunction
 
     //root mean square error
     function fRMSE();
-        rmse = $sqrt(mse);
-        $display("rmse: %.9f", rmse);
+        rmse_Real0 = $sqrt(mse_Real0);
+        rmse_Img0 = $sqrt(mse_Img0);
+        rmse_Real1 = $sqrt(mse_Real1);
+        rmse_Img1 = $sqrt(mse_Img1);
+        $display("Real0 rmse: %.9f", rmse_Real0);
+        $display("Img0 rmse: %.9f", rmse_Img0);
+        $display("Real1 rmse: %.9f", rmse_Real1);
+        $display("Img1 rmse: %.9f", rmse_Img1);
     endfunction
 
 endclass
@@ -322,12 +311,6 @@ module uButterfly_tb();
         .sobolseq(sobolseq_tbD)
     );
 
-    //JUST FOR TESTING CUZ I HAVE ERROR !!!!!!!!!!!!!!!!!!!!!!!
-    logic eq_1;
-    logic eq_4;
-    logic eq_real;
-    logic oSReal;
-
     uButterfly #(
         .BITWIDTH(BITWIDTH),
         .BINPUT(BINPUT)
@@ -347,11 +330,7 @@ module uButterfly_tb();
         .oReal0(oReal0),
         .oImg0(oImg0),
         .oReal1(oReal1),
-        .oImg1(oImg1),
-        .oEq_1(oEq_1),
-        .oEq_4(oEq_4),
-        .oEq_real(oEq_real),
-        .oSReal(oSReal)
+        .oImg1(oImg1)
     );
 
     always #5 iClk = ~iClk;
@@ -395,11 +374,15 @@ module uButterfly_tb();
                 iReal1 = (rand_iReal1 > sobolseq_tbC);
                 iImg1 = (rand_iImg1 > sobolseq_tbD);
                 error.count(iReal0, iImg0, iReal1, iImg1, oBReal, oBImg, result1[PPCYCLE-1], result2[PPCYCLE-1], 
-                result3[PPCYCLE-1], result4[PPCYCLE-1], oEq_1, oEq_4, oEq_real, oSReal);
+                result3[PPCYCLE-1], result4[PPCYCLE-1]);
             end
 
             error.fSUM();
         end
+
+        //gives final error results
+        error.fMSE();
+        error.fRMSE();
 
         iClr = 1;
         iReal0 = 0;
