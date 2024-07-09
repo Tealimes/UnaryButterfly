@@ -22,8 +22,6 @@ module uButterfly #(
     input wire iImg1,
     input wire [BITWIDTH-1:0] iwReal,
     input wire [BITWIDTH-1:0] iwImg,
-    output wire oBReal,
-    output wire oBImg,
     output wire oReal0,
     output wire oImg0,
     output wire oReal1,
@@ -58,7 +56,6 @@ module uButterfly #(
         .iB(iwReal),
         .loadB(loadW),
         .iClr(iClr),
-        .oB(oBReal),
         .oMult(eq_Real1_x_wReal)
     );
 
@@ -71,7 +68,6 @@ module uButterfly #(
         .iB(iwImg),
         .loadB(loadW),
         .iClr(iClr),
-        .oB(oBImg),
         .oMult(eq_Real1_x_wImg)
     );
 
