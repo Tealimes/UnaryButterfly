@@ -43,6 +43,9 @@ class errorcheck;
 
     function new();
         asum_Real0 = 0;
+        asum_Img0 = 0;
+        asum_Real1 = 0;
+        asum_Img1 = 0;
         fdenom = 0;
         cntReal0 = 0;
         cntImg0 = 0;
