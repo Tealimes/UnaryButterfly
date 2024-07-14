@@ -56,7 +56,7 @@ class errorcheck;
         outReal0 = 0;
         outImg0 = 0;
         outReal1 = 0;
-        outReal0 = 0;
+        outImg1 = 0;
         j = 0;
     endfunction
 
